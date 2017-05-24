@@ -1,4 +1,4 @@
-from dom import application
+from domsite import application
 
 if __name__ == "__main__":
     application.run()
