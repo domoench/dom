@@ -9,11 +9,11 @@
                 col-xs-12">
     <nav class="text-center">
       <ul>
-        <li><a href="projects.php">projects</a></li>
+        <li><a href="{{ url_for('projects') }}">projects</a></li>
         <li><a href="https://github.com/domoench" target="_blank">github</a></li>
-        <li><a href="resume.pdf">resume</a></li>
+        <li><a href="{{ url_for('static', filename='resume.pdf') }}">resume</a></li>
         <li><a href="http://www.linkedin.com/pub/david-ouyang-moench/5a/3a7/288" target="_blank">linkedin</a></li>
-        <li><a href="music.php">music</a></li>
+        <li><a href="{{ url_for('music') }}">music</a></li>
       </ul>
     </nav>
     </div>

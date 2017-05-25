@@ -60,9 +60,9 @@ body {
   #projects-page section.project a p {
     color: #232828; }
   #projects-page section.project a:hover {
-    -moz-box-shadow: 3px 3px 6px 0 #aaaaaa;
-    -webkit-box-shadow: 3px 3px 6px 0 #aaaaaa;
-    box-shadow: 3px 3px 6px 0 #aaaaaa;
+    -moz-box-shadow: 3px 3px 6px 0 #AAAAAA;
+    -webkit-box-shadow: 3px 3px 6px 0 #AAAAAA;
+    box-shadow: 3px 3px 6px 0 #AAAAAA;
     background-color: #EEEEEE; }
 
 #music-page section.project-category {

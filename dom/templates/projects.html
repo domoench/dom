@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="projects-page" class="page-content">
+
+  <div class="row detail-header">
+    <a class="homelink col-lg-3 col-xs-4 pull-left" href="{{ url_for('index') }}">&lt;&lt; home</a>
+    <div class="pull-right text-right col-lg-9 col-xs-8">
+      <h1>david ouyang moench</h1>
+      <h2>Projects</h2>
+    </div>
+  </div>
+
+    <section class="project">
+    <a href="{{ url_for('fmri') }}">
+      <h3>FMRI Visualization</h3>
+      <p>A Python software tool for use by neuroscience researchers to
+         visualize neuronal connetomics data acquired through fMRI.</p>
+    </a>
+    </section> <!-- end .project -->
+
+    <section class="project">
+    <a href="https://github.com/domoench/fwoom">
+      <h3>Fwoom</h3>
+      <p>A 2D space arcade game, similar to the classic Atari 'Asteroids',
+         written with WebGL and Three.js. (In Progress)</p>
+    </a>
+    </section> <!-- end .project -->
+
+    <section class="project">
+    <a href="https://github.com/domoench/BallotBox">
+      <h3>BallotBox</h3>
+      <p>A web application for conducting polls. It doesn't require participants
+         to create user accounts, yet it prevents voter fraud by leveraging the
+         uniqueness of their email addresses. Implemented with Python and Flask.</p>
+    </a>
+    </section> <!-- end .project -->
+
+    <section class="project">
+    <a href="https://github.com/domoench/Quadtree">
+      <h3>Quadtree</h3>
+      <p>A region-based quadtree data-structure that supports dynamic insertion
+         written with C++ and GPU shader based OpenGL.</p>
+    </a>
+    </section> <!-- end .project -->
+
+    <section class="project">
+    <a href="http://flyingcubes.davidmoench.com">
+      <h3>Flying Cubes</h3>
+      <p>A 3D interactive world of bouncing cubes written with Javascript and
+         WebGL. I created this before discovering Three.js, so this project was an
+         exercise in working directly with the WebGL API.</p>
+    </a>
+    </section> <!-- end .project -->
+
+    <section class="project">
+    <a href="https://github.com/aelx311/austin_recycling">
+      <h3>Austin Recycling</h3>
+      <p>An Android application developed with Alex Ng and Chan-Tang Hsu
+      to help people in Austin find recycling drop off locations.</p>
+    </a>
+    </section> <!-- end .project -->
+
+</div> <!-- End #projects-page -->
+
+{% endblock %}
