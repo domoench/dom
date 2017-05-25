@@ -1,0 +1,102 @@
+@import url(reset.css);
+@import url(bootstrap.css);
+body {
+  font-family: 'Ubuntu', sans-serif; }
+
+.container {
+  padding-top: 0em; }
+
+@media (min-width: 768px) {
+  .container {
+    padding-top: 50px; } }
+.homelink {
+  padding-top: 30px;
+  text-decoration: none; }
+
+#home-page h1 {
+  padding-bottom: 15px; }
+#home-page nav {
+  background-color: #053749; }
+  #home-page nav ul {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    list-style-type: none; }
+    #home-page nav ul li {
+      padding: 0.2em;
+      font-size: 20px; }
+      #home-page nav ul li a {
+        text-decoration: none;
+        color: #FFE9D2; }
+        #home-page nav ul li a:hover {
+          color: #EFA658; }
+
+.detail-header a {
+  text-decoration: none;
+  -webkit-transform: translateZ(0);
+  -webkit-transition: 200ms linear;
+  -o-transition: 200ms linear;
+  -moz-transition: 200ms linear;
+  transition: 200ms linear;
+  color: #000000; }
+  .detail-header a:hover {
+    color: #62B1D0; }
+.detail-header h2 {
+  margin-top: 0px;
+  color: gray;
+  font-size: 20px; }
+
+#projects-page section.project a {
+  text-decoration: none;
+  display: block;
+  padding: 5px 20px;
+  -webkit-transform: translateZ(0);
+  -webkit-transition: 150ms linear;
+  -o-transition: 150ms linear;
+  -moz-transition: 150ms linear;
+  transition: 150ms linear; }
+  #projects-page section.project a h3 {
+    margin: 10px 0px;
+    color: #053749; }
+  #projects-page section.project a p {
+    color: #232828; }
+  #projects-page section.project a:hover {
+    -moz-box-shadow: 3px 3px 6px 0 #aaaaaa;
+    -webkit-box-shadow: 3px 3px 6px 0 #aaaaaa;
+    box-shadow: 3px 3px 6px 0 #aaaaaa;
+    background-color: #EEEEEE; }
+
+#music-page section.project-category {
+  padding-bottom: 20px; }
+  #music-page section.project-category h3 {
+    margin: 10px 0px;
+    color: #053749; }
+  #music-page section.project-category .link, #music-page section.project-category .vid-link {
+    padding: 7px 20px; }
+    #music-page section.project-category .link a, #music-page section.project-category .vid-link a {
+      text-decoration: none;
+      -webkit-transform: translateZ(0);
+      -webkit-transition: 200ms linear;
+      -o-transition: 200ms linear;
+      -moz-transition: 200ms linear;
+      transition: 200ms linear;
+      color: #000000;
+      color: #7C7777;
+      font-size: 16px; }
+      #music-page section.project-category .link a:hover, #music-page section.project-category .vid-link a:hover {
+        color: #62B1D0; }
+
+#fmri-viz-page section {
+  padding: 20px 10px; }
+  #fmri-viz-page section p a {
+    text-decoration: none;
+    -webkit-transform: translateZ(0);
+    -webkit-transition: 200ms linear;
+    -o-transition: 200ms linear;
+    -moz-transition: 200ms linear;
+    transition: 200ms linear;
+    color: #000000;
+    color: #62B1D0; }
+    #fmri-viz-page section p a:hover {
+      color: #62B1D0; }
+    #fmri-viz-page section p a:hover {
+      color: #EFA658; }
