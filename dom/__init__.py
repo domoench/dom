@@ -1,1 +1,0 @@
-from .dom import application

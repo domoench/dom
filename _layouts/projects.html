@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include head.html %}
+
+  <body>
+    <div class="container projects">
+      {% include header.html title=page.title %}
+
+      <nav>
+        <ul>
+          <li>
+            <a href="{{ site.url }}/fmri-viz">
+              <h3>FMRI Visualization</h3>
+              <p>A Python software tool for use by neuroscience researchers to
+                visualize neuronal connetomics data acquired through fMRI.</p>
+            </a>
+          </li>
+          <li>
+            <a href="{{ site.url }}/fwoom">
+              <h3>Fwoom</h3>
+              <p>A 2D space arcade game, similar to the classic Atari 'Asteroids',
+                 written with WebGL and Three.js. (In Progress)</p>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/domoench/Quadtree">
+              <h3>Quadtree</h3>
+              <p>A region-based quadtree data-structure that supports dynamic insertion
+                 written with C++ and GPU shader based OpenGL.</p>
+            </a>
+          </li>
+          <li>
+            <a href="{{ site.url }}/flyingcubes">
+              <h3>Flying Cubes</h3>
+              <p>A 3D interactive world of bouncing cubes written with Javascript and
+                       WebGL. I created this before discovering Three.js, so this project was an
+                                exercise in working directly with the WebGL API.</p>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/aelx311/austin_recycling">
+              <h3>Austin Recycling</h3>
+              <p>An Android application developed with Alex Ng and Chan-Tang Hsu
+                 to help people in Austin find recycling drop off locations.</p>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </body>
+
+</html>

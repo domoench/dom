@@ -1,0 +1,611 @@
+
+<!-- TODO update glMatrix library and use official methods -->
+<html>
+
+<head>
+<title>Flying Cubes!</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="/assets/flyingcubes/css/style.css">
+<script type="text/javascript" src="/assets/flyingcubes/js/glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="/assets/flyingcubes/js/webgl-utils.js"></script>
+<!-- TODO Replace with requestAnimFrame Paul Irish Shim? -->
+
+<script id="shader-fs" type="x-shader/x-fragment">
+    precision mediump float;
+
+    varying vec4 vColor;
+
+    void main(void)
+	{
+        gl_FragColor = vColor;
+    }
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void)
+	{
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+    }
+</script>
+
+<script type="text/javascript">
+
+    var gl;
+
+	// Create WebGL context
+    function initGL(canvas)
+	{
+        try
+		{
+            gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            gl.viewportWidth = canvas.width;
+            gl.viewportHeight = canvas.height;
+        } catch (e) {
+			// TODO
+        }
+        if (!gl)
+		{
+            alert("Could not initialise WebGL. Check for support and instructions on enabling WebGL at http://caniuse.com/webgl");
+        }
+    }
+
+	/*-------------------------------------------------------------------------*\
+		SHADERS
+	\*-------------------------------------------------------------------------*/
+
+	// Get GLSL source code string from DOM
+    function getShader(gl, id)
+	{
+        var shaderScript = document.getElementById(id);
+        if (!shaderScript)
+		{
+            return null;
+        }
+
+        var str = "";
+        var k = shaderScript.firstChild;
+        while (k)
+		{
+            if (k.nodeType == 3)
+			{
+                str += k.textContent;
+            }
+            k = k.nextSibling;
+        }
+
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment")
+		{
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+		{
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+
+        return shader;
+    }
+
+    var shaderProgram;
+
+	// Compile and link shaders into a program object for use by WebGL context
+    function initShaders()
+	{
+        var fragmentShader = getShader(gl, "shader-fs");
+        var vertexShader = getShader(gl, "shader-vs");
+
+        shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+		{
+            alert("Could not initialise shaders");
+        }
+
+        gl.useProgram(shaderProgram);
+
+		// Map out how to pass attributes to vertex shader
+        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+        shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+        gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
+		// Establish link between GPU shaders and javascript code to push matrix uniforms
+        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+    }
+
+	// Load javascript matrices to the shaders on the GPU
+    function setMatrixUniforms()
+	{
+        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+    }
+
+	/*-------------------------------------------------------------------------*\
+		Model-View Matrix State Stack
+	\*-------------------------------------------------------------------------*/
+    var mvMatrix = mat4.create();
+    var mvMatrixStack = [];
+    var pMatrix = mat4.create();
+
+	// Push
+    function mvPushMatrix()
+	{
+        var copy = mat4.create();
+        mat4.set(mvMatrix, copy);
+        mvMatrixStack.push(copy);
+    }
+
+	// Pop
+    function mvPopMatrix()
+	{
+        if (mvMatrixStack.length == 0)
+		{
+            throw "Invalid popMatrix!";
+        }
+        mvMatrix = mvMatrixStack.pop();
+    }
+
+	/*-------------------------------------------------------------------------*\
+		BUFFERS
+	\*-------------------------------------------------------------------------*/
+    var cubeVertexPositionBuffer;
+    var cubeVertexColorBuffer;
+    var cubeVertexIndexBuffer;
+
+	// Create buffer object and bind them to our context (Load into GPU)
+    function initBuffers()
+	{
+        cubeVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+        vertices = [
+            // Front face
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0,
+             1.0,  1.0,  1.0,
+            -1.0,  1.0,  1.0,
+
+            // Back face
+            -1.0, -1.0, -1.0,
+            -1.0,  1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0, -1.0, -1.0,
+
+            // Top face
+            -1.0,  1.0, -1.0,
+            -1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0, -1.0,
+
+            // Bottom face
+            -1.0, -1.0, -1.0,
+             1.0, -1.0, -1.0,
+             1.0, -1.0,  1.0,
+            -1.0, -1.0,  1.0,
+
+            // Right face
+             1.0, -1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0,  1.0,  1.0,
+             1.0, -1.0,  1.0,
+
+            // Left face
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0,
+            -1.0,  1.0,  1.0,
+            -1.0,  1.0, -1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        cubeVertexPositionBuffer.itemSize = 3;
+        cubeVertexPositionBuffer.numItems = 24;
+
+        cubeVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
+        colors = [
+            [0.0, 166.0/255, 124.0/255, 1.0], // Front face
+            [53.0/255, 210.0/255, 171.0/255, 1.0], // Back face
+            [65.0/255, 219.0/255, 0.0, 1.0], // Top face
+            [112.0/255, 237.0/255, 59.0/255, 1.0], // Bottom face
+            [14.0/255, 81.0/255, 167.0/255, 1.0], // Right face
+            [66.0/255, 130.0/255, 211.0/255, 1.0]  // Left face
+        ];
+        var unpackedColors = [];
+		// Loop to set rgba color values for all 24 vertices in a less repetitive way
+        for (var i in colors)
+		{
+            var color = colors[i];
+            for (var j=0; j < 4; j++)
+			{
+                unpackedColors = unpackedColors.concat(color);
+            }
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
+        cubeVertexColorBuffer.itemSize = 4;
+        cubeVertexColorBuffer.numItems = 24;
+
+		// Index buffer specifies groups of 3 indices in the position/color buffers will
+		// be connected into triangles via the drawElements command
+        cubeVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+        var cubeVertexIndices = [
+            0, 1, 2,      0, 2, 3,    // Front face
+            4, 5, 6,      4, 6, 7,    // Back face
+            8, 9, 10,     8, 10, 11,  // Top face
+            12, 13, 14,   12, 14, 15, // Bottom face
+            16, 17, 18,   16, 18, 19, // Right face
+            20, 21, 22,   20, 22, 23  // Left face
+        ];
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+        cubeVertexIndexBuffer.itemSize = 1;
+        cubeVertexIndexBuffer.numItems = 36;
+    }
+
+	/*-------------------------------------------------------------------------*\
+		DRAW
+	\*-------------------------------------------------------------------------*/
+    var rCube = 0;
+
+	// Set viewport, projection matrix, mv matrix zoom, and call .draw on
+	// each cube
+    function drawScene()
+	{
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        mat4.perspective(60, gl.viewportWidth / gl.viewportHeight, 0.1, 200.0, pMatrix);
+
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, [0.0, 0.0, zoom]);
+        mat4.rotate(mvMatrix, degToRad(x_axis_tilt), [1.0, 0.0, 0.0]);
+        mat4.rotate(mvMatrix, degToRad(y_axis_tilt), [0.0, 1.0, 0.0]);
+
+        mat4.translate(mvMatrix, [0.0, 0.0, 0.0]);
+
+		for( var i in cubes )
+		{
+			cubes[i].draw(x_axis_tilt, y_axis_tilt);
+		}
+    }
+
+	/*-------------------------------------------------------------------------*\
+		CUBE CLASS
+	\*-------------------------------------------------------------------------*/
+
+	// Construct a new cube based on the give vec3 position, velocity, rotation vector,
+	// and rotation speed randomizer
+	var Cube = function(_pos, _vel, _rotation_vector, _rotation_speed_randomizer)
+	{
+		this.pos = _pos;
+		this.vel = _vel;
+		this.rotation_vector = _rotation_vector;
+		this.rotation_speed_randomizer = _rotation_speed_randomizer * 4;
+
+		return this;
+	}
+
+	Cube.prototype =
+	{
+		scale : 1, // Use to change cube size + calculate mass
+
+		// Set MV Matrix to cubes position and call renderCube
+		draw : function(x_axis_tilt, y_axis_tilt)
+		{
+			mvPushMatrix();
+
+			// Set MV Matrix to Cube's position
+			mat4.translate(mvMatrix, [this.pos[0], this.pos[1], this.pos[2]]);
+			mat4.rotate(mvMatrix, degToRad(rCube * this.rotation_speed_randomizer),
+				[this.rotation_vector[0], this.rotation_vector[1], this.rotation_vector[2]]);
+
+			// Apply tilts
+			mat4.rotate(mvMatrix, degToRad(x_axis_tilt), [1.0, 0.0, 0.0]);
+			mat4.rotate(mvMatrix, degToRad(y_axis_tilt), [0.0, 1.0, 0.0]);
+
+			renderCube();
+
+			mvPopMatrix();
+		},
+
+		// Modify each cubes position based on its velocity, position, and elapsedTime
+		animate : function(elapsed)
+		{
+			var effective_frames_passed = EFFECTIVE_FPMS * elapsed;
+
+			// Update velocity vector with acceleration forces (v = v0 + at)
+			var sum_accel_vect = vec3.create();
+			sum_accel_vect = this.sumAccelerations();
+			this.vel = addVectors(this.vel, scaleVector(effective_frames_passed, sum_accel_vect));
+
+			// Update x,y,z coords. delta = vel * time. Bounce off walls of WORLD
+			for( var i = 0; i < 3; i++)
+			{
+				if( Math.abs(this.pos[i]) > MAX_COORD)
+				{
+					this.vel[i] *= 0.75; // Lose energy when bouncing
+					this.vel[i] *= -1; // Reverse direction
+					this.pos[i] = (this.pos[i] >= 0) ? MAX_COORD : -MAX_COORD;
+				}
+				this.pos[i] += this.vel[i] * effective_frames_passed;
+			}
+		},
+
+		// Sum all accelerations (Forces) on this cube.
+		sumAccelerations : function()
+		{
+			var sum_accel = vec3.create();
+
+			// Add Black hole acceleration vector. Tied to c key.
+			if(current_pressed_keys[67])
+			{
+				// Get a vector pointing to the origin
+				converge_accel_vect = vec3.create();
+				converge_accel_vect = addVectors(converge_accel_vect, this.pos);
+				converge_accel_vect = scaleVector(-.001, converge_accel_vect);
+
+				sum_accel = addVectors(sum_accel, converge_accel_vect);
+			}
+
+			// Add decceleration vector. Tied to b key.
+			if(current_pressed_keys[66])
+			{
+				deccel_vect = vec3.create();
+				deccel_vect = addVectors(deccel_vect, this.vel); // Same direction as velocity
+				deccel_vect = scaleVector(-.05, deccel_vect); // Reverse and scale down magnitude
+
+				sum_accel = addVectors(sum_accel, deccel_vect);
+			}
+
+			// Add gravity acceleration
+			if(gravity_on)
+			{
+				sum_accel = addVectors(sum_accel, gravity);
+			}
+
+			return sum_accel;
+		}
+	}
+
+	// Pass attributes to vertex shader and call drawArrays
+	function renderCube()
+	{
+		// Switch to cube vertex buffer + pass it up to WebGL
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+		// Switch to cube color buffer + pass it up to WebGL
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cubeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+		// drawElements uses the index buffer to determine which vertices in the position buffer
+		// to connect into triangles to make the cube surfaces
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+        setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	}
+
+	var cubes = [];
+	function buildObjects()
+	{
+		for( var i = 0; i < NUM_CUBES; i++)
+		{
+			var pos = vec3.create({
+				0 : 0,
+				1 : 0,
+				2 : 0
+			});
+			var vel = vec3.create({
+				0 : (Math.random() - Math.random()) * 0.6,
+				1 : (Math.random() - Math.random()) * 0.6,
+				2 : (Math.random() - Math.random()) * 0.6
+			});
+			var rotation_vector = vec3.create({
+				0 : Math.random(),
+				1 : Math.random(),
+				2 : Math.random()
+			});
+			cubes.push(new Cube(pos, vel, rotation_vector, Math.random()));
+		}
+	}
+
+	/*-------------------------------------------------------------------------*\
+		ANIMATION
+	\*-------------------------------------------------------------------------*/
+
+    var lastTime = 0;
+
+	// Update object states based on elapsed time
+    function animate()
+	{
+        var timeNow = new Date().getTime();
+        if (lastTime != 0)
+		{
+            var elapsed = timeNow - lastTime;
+
+            rCube -= (75 * elapsed) / 1000.0;
+
+			// Move each cube
+			for( var i in cubes )
+			{
+				cubes[i].animate(elapsed);
+			}
+        }
+
+        lastTime = timeNow;
+    }
+
+    function tick()
+	{
+        requestAnimFrame(tick);
+		handleKeys();
+        drawScene();
+        animate();
+    }
+
+	/*-------------------------------------------------------------------------*\
+		HELPERS
+	\*-------------------------------------------------------------------------*/
+
+	// TODO update gl-matrix library to 2.0 and remove all the hacky vector math
+
+	// Add 2 Vec3 Objects and return the sum vector
+	function addVectors(v1, v2)
+	{
+		var v3 = vec3.create();
+		for(var i = 0; i < 3; i++)
+		{
+			v3[i] = v1[i] + v2[i];
+		}
+		return v3;
+	}
+
+	// Returns the result of a vector multiplied by a scalar
+	function scaleVector(scale, vect)
+	{
+		var res = vec3.create();
+		for(var i = 0; i < 3; i++)
+		{
+			res[i] = vect[i] * scale;
+		}
+		return res;
+	}
+
+	// Convert degrees to radians
+    function degToRad(degrees)
+	{
+        return degrees * Math.PI / 180;
+    }
+
+	/*-------------------------------------------------------------------------*\
+		INPUT HANDLERS
+	\*-------------------------------------------------------------------------*/
+	current_pressed_keys = 	{};
+
+	// Add held keys to currently_pressed_keys dictionary and toggle gravity
+	// global boolean
+	function handleKeyDown(event)
+	{
+		// Pressing g toggles gravity global boolean
+		if(event.keyCode == 71) gravity_on = !gravity_on;
+
+		current_pressed_keys[event.keyCode] = true;
+	}
+
+	// Remove key from currently_pressed_keys dictionary
+	function handleKeyUp(event)
+	{
+		current_pressed_keys[event.keyCode] = false;
+	}
+
+	// Use currently pressed keys to modify the scene tilt and zoom
+	function handleKeys()
+	{
+		// Arrow up: tilt scene around the x axis
+		if(current_pressed_keys[38])
+		{
+			x_axis_tilt += 1;
+		}
+
+		// Arrow down: tilt scene around the x axis
+		if(current_pressed_keys[40])
+		{
+			x_axis_tilt += -1;
+		}
+
+		// Arrow left: tilt scene around the y axis
+		if(current_pressed_keys[37])
+		{
+			y_axis_tilt += 1;
+		}
+
+		// Arrow right: tilt scene around the y axis
+		if(current_pressed_keys[39])
+		{
+			y_axis_tilt += -1;
+		}
+
+		// > : zoom in
+		if(current_pressed_keys[190])
+		{
+			zoom += -1;
+		}
+
+		// < : zoom out
+		if(current_pressed_keys[188])
+		{
+			zoom += 1;
+		}
+
+		// The following are handled in Cube.animate:
+		// c: applies black hold force at origin.
+		// b: decelerate cubes.
+	}
+
+	/*-------------------------------------------------------------------------*\
+		DRIVER PROGRAM
+	\*-------------------------------------------------------------------------*/
+
+	// SETTINGS
+	var MAX_COORD = 25; // (N+N)x(N+N)x(N+N) cube world
+	var NUM_CUBES = 60;
+	var EFFECTIVE_FPMS = 60 / 1000; // Calculate frames passed smoothly based on time
+	var gravity = vec3.create({0:0, 1:-0.02, 2:0});
+	var gravity_on = false;
+	var x_axis_tilt = 0;
+	var y_axis_tilt = 0;
+	var zoom = -50;
+
+
+    function webGLStart()
+	{
+        var canvas = document.getElementById("lesson04-canvas");
+        initGL(canvas);
+        initShaders()
+        initBuffers();
+		buildObjects();
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+
+		// Key Input
+        document.onkeydown = handleKeyDown;
+        document.onkeyup = handleKeyUp;
+
+        tick();
+    }
+</script>
+
+</head>
+
+<body onload="webGLStart();">
+    <div id="wrapper">
+        <canvas id="lesson04-canvas" style="border: none;" width="720" height="560"></canvas>
+		<p> CONTROLS: g - toggle gravity. b - slow the cubes. c - apply black hole.
+		arrows - rotate and tilt view. &lt and &gt - zoom in and out.</p>
+    </div> <!-- end #wrapper -->
+</body>
+
+</html>

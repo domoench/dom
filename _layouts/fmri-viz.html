@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include head.html %}
+
+  <body>
+    <div class="container fmri">
+      {% include header.html title=page.title %}
+
+      <p>
+        I obtained funding, conducted research, and implemented a software tool for the
+        <a href="https://www.ices.utexas.edu/research/centers-groups/cvc/">
+          Computational Visualization Center at UT Austin
+        </a> for use by neuroscience researchers to visualize neuronal
+        connetomics data acquired through fMRI. It is implemented with Python and Matplotlib.
+      </p>
+
+      <p>
+        A key requirement of the software was the ability to generate high-resolution images
+        that could be printed as large scientific posters. To that end, this tool outputs PDF images,
+        which maintain resolution at large scale. Click the image below to access the PDF version
+        and zoom in on details.
+      </p>
+
+      <figure class="figure">
+        <a href="{{ site.url }}/assets/fmri-viz.pdf">
+          <img class="img-fluid" src="{{ site.url }}/assets/img/fmri-viz.jpg" alt="FMRI Visualization" />
+        </a>
+        <figcaption class="figure-caption">The above image is generated with mock fMRI data.</figcaption>
+      </figure>
+
+    <div>
+  </body>
+
+</html>

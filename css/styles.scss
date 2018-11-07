@@ -1,0 +1,140 @@
+---
+# Front matter comment to ensure Jekyll properly reads file.
+---
+@import "reset";
+
+// Font family
+$body-font-family: 'Ubuntu', sans-serif;
+$body-font-size: 16px;
+
+// Color variables
+$dark-blue: #053749;
+$gray: #727171;
+$light-gray: #EEEEEE;
+$pale-yellow: #FFE9D2;
+$orange: #EFA658;
+
+$screen-sm-min: 768px;
+
+body {
+	font-family: $body-font-family;
+  font-size: $body-font-size;
+}
+
+h1 { font-size: $body-font-size * 2.5; }
+h2 { font-size: $body-font-size * 1.7; }
+h3 { font-size: $body-font-size * 1.5; }
+
+p {
+  padding: 0.5em 0;
+}
+
+ul {
+	list-style: none;
+}
+
+a {
+	text-decoration: none;
+  color: $dark-blue;
+  &:hover {
+	  text-decoration: none;
+    color: $orange;
+  }
+}
+
+.container {
+	padding: 30px 0;
+}
+
+.home {
+  header {
+    padding-bottom: 0.5em;
+    h1 {
+      color: $dark-blue;
+      padding-bottom: 0.2em;
+    }
+  }
+
+  nav {
+    background-color: $dark-blue;
+    ul {
+      padding: 1em 0;
+      li {
+        padding: 0.5em;
+        font-size: $body-font-size * 1.5;
+				a {
+					color: $pale-yellow;
+					&:hover {
+            color: $orange;
+          }
+				}
+      }
+    }
+  }
+}
+
+.detail-header {
+  padding-bottom: 1em;
+  padding-right: 20px;
+	h1 {
+		display: none;
+		color: $dark-blue;
+    &:hover {
+      color: $orange;
+    }
+	}
+
+	h2 {
+		color: $gray;
+	}
+
+	@media (min-width: $screen-sm-min) {
+		h1 {
+			display: block;
+		}
+	}
+}
+
+.projects {
+	nav {
+    li {
+      padding: 1em 1em;
+      a {
+        display: block;
+        color: $dark-blue;
+        h3 {
+          margin: 0.2em 0;
+          padding-bottom: 0.1em;
+        }
+        p {
+          color: $gray;
+        }
+      }
+      &:hover {
+        background-color: $light-gray;
+      }
+    }
+	}
+}
+
+.music {
+  h3 {
+    margin: 0.5em;
+    padding-bottom: 0.1em;
+  }
+	ul {
+    li {
+      padding: 1.5em;
+      a {
+        display: block;
+        color: $dark-blue;
+        p {
+          color: $gray;
+        }
+      }
+      &:hover {
+        background-color: $light-gray;
+      }
+    }
+	}
+}
