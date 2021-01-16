@@ -4,6 +4,7 @@ const DEBUG = false;
 
 // Flags
 let nameDrawn = false;
+let overlayVisible = false;
 
 // truePercent(0.5) returns true 50% of the time
 const truePercent = p => Math.random() < p;
@@ -289,9 +290,11 @@ const setCSS = ({ viewH, padH, padW }) => {
   sheet.replaceSync(`
     ${moveStyles()}
     #splash {
-      width: 100%;
+      width: 100vw;
       height: ${viewH}px;
-      margin: ${padH}px ${padW}px;
+    }
+    #splash-svg {
+      margin-top: ${padH}px;
     }
   `);
   document.adoptedStyleSheets = [sheet];
@@ -337,3 +340,20 @@ window.onresize = debounce(() => {
 
   draw(dimensions);
 }, 200);
+
+// Toggle nav menu modal visibility
+window.onclick = (e) => {
+  const clickedInsideModal = e.target.closest('.overlay-content');
+  if (!overlayVisible || !clickedInsideModal) {
+    // Toggle modal visibility
+    overlayVisible = !overlayVisible;
+    modalOpacity = overlayVisible ? 1.0 : 0.0;
+    document.querySelector(".overlay-content").style.opacity = modalOpacity;
+
+    // Toggle visibility of SVG animated name
+    svgText = document.querySelector('#splash-svg text')
+    if (svgText) {
+      svgText.style.opacity = 1.0 - modalOpacity;
+    }
+  }
+}
