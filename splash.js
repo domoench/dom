@@ -189,7 +189,7 @@ const draw = ({ viewW, viewH, cellW }) => {
     t.setAttribute('lengthAdjust', 'spacingAndGlyphs');
     t.setAttribute('text-anchor', 'middle');
     t.setAttribute('dominant-baseline', 'central');
-    t.setAttribute('style', `font-size:${0.12 * w}px`);
+    t.setAttribute('style', `font-size:${0.12 * w}px; font-family:Ubuntu,sans-serif;`);
     t.className.baseVal = 'text';
     const textNode = document.createTextNode('david ouyang moench');
     t.appendChild(textNode);
