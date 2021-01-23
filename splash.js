@@ -107,7 +107,7 @@ const draw = ({ viewW, viewH, cellW }) => {
   console.log('draw()');
   const svg = document.getElementById('splash-svg');
 
-  const singleCell = (w, h) => w === 1 && h === 1;
+  const isSingleCell = (w, h) => w === 1 && h === 1;
   const isSquare = (x, y) => x === y;
 
   // Return a random movement class
@@ -191,7 +191,7 @@ const draw = ({ viewW, viewH, cellW }) => {
     t.setAttribute('dominant-baseline', 'central');
     t.setAttribute('style', `font-size:${0.12 * w}px`);
     t.className.baseVal = 'text';
-    const textNode = document.createTextNode('David Ouyang Moench');
+    const textNode = document.createTextNode('david ouyang moench');
     t.appendChild(textNode);
     svg.appendChild(t);
   };
@@ -238,8 +238,8 @@ const draw = ({ viewW, viewH, cellW }) => {
       return;
     }
     // Base Case II: single cell
-    if (singleCell(w, h)) {
-      fillRandom(xPx, yPx, wPx, 0.1);
+    if (isSingleCell(w, h)) {
+      fillRandom(xPx, yPx, wPx, 0.15);
       return;
     }
     // Base Case III: multi-cell square
@@ -251,7 +251,7 @@ const draw = ({ viewW, viewH, cellW }) => {
           fillText(xPx, yPx, wPx);
           nameDrawn = true;
         }
-        // III.B: Dense fill
+      // III.B: Dense fill
       } else if (depth > 2) {
         // Divide the space into squares
         const divisor = truePercent(0.8) ? 2 : 4;
@@ -326,11 +326,31 @@ function debounce(func, wait, immediate) {
 	};
 };
 
+const toggleNavModal = () => {
+  // Toggle modal visibility
+  overlayVisible = !overlayVisible;
+  modalOpacity = overlayVisible ? 1.0 : 0.0;
+  document.querySelector(".overlay-content").style.opacity = modalOpacity;
+
+  // Toggle visibility of SVG animated name
+  svgText = document.querySelector('#splash-svg text')
+  if (svgText) {
+    svgText.style.opacity = 1.0 - modalOpacity;
+  }
+}
+
 // MAIN
 window.onload = () => {
   const dimensions = calculateDimensions();
   setCSS(dimensions);
   draw(dimensions);
+
+  // Show nav modal after a pausee if it's not already visible
+  setTimeout(() => {
+    if (!overlayVisible) {
+      toggleNavModal();
+    }
+  }, 3 * 1000);
 }
 
 window.onresize = debounce(() => {
@@ -351,17 +371,11 @@ window.onresize = debounce(() => {
 
 // Toggle nav menu modal visibility
 window.onclick = (e) => {
+  // Determine if click is inside nav modal. If so we'll assume user is trying
+  // to interact with modal, so we won't want to toggle its visibility.
   const clickedInsideModal = e.target.closest('.overlay-content');
-  if (!overlayVisible || !clickedInsideModal) {
-    // Toggle modal visibility
-    overlayVisible = !overlayVisible;
-    modalOpacity = overlayVisible ? 1.0 : 0.0;
-    document.querySelector(".overlay-content").style.opacity = modalOpacity;
 
-    // Toggle visibility of SVG animated name
-    svgText = document.querySelector('#splash-svg text')
-    if (svgText) {
-      svgText.style.opacity = 1.0 - modalOpacity;
-    }
+  if (!overlayVisible || !clickedInsideModal) {
+    toggleNavModal();
   }
 }
