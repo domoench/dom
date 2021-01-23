@@ -286,8 +286,16 @@ const draw = ({ viewW, viewH, cellW }) => {
 }
 
 const setCSS = ({ viewH, padH, padW }) => {
-  const sheet = new CSSStyleSheet();
-  sheet.replaceSync(`
+  // Clear pre-existing styles
+  const prevStyles = document.getElementById('dynamic-styles')
+  if (prevStyles) {
+    prevStyles.remove(prevStyles);
+  }
+
+  // Set new styles
+  const styles = document.createElement('style');
+  styles.id = 'dynamic-styles';
+  styles.innerHTML = `
     ${moveStyles()}
     #splash {
       width: 100vw;
@@ -296,8 +304,8 @@ const setCSS = ({ viewH, padH, padW }) => {
     #splash-svg {
       margin-top: ${padH}px;
     }
-  `);
-  document.adoptedStyleSheets = [sheet];
+  `;
+  document.head.appendChild(styles);
 };
 
 // Ripped debounce function off of underscore js. Inlining the function
