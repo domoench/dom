@@ -56,28 +56,39 @@ a {
 	}
 }
 
-.home {
-  header {
-    padding-bottom: 0.5em;
-    h1 {
-      color: $dark-blue;
-      padding-bottom: 0.2em;
+#splash {
+  #splash-svg {
+    text {
+      transition: opacity 1s;
     }
   }
+  #overlay {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-  nav {
-    background-color: $dark-blue;
-    ul {
-      padding: 1em 0;
-      li {
-        padding: 0.5em;
-        font-size: $body-font-size * 1.3;
-				a {
-					color: $pale-yellow;
-					&:hover {
-            color: $orange;
+    .overlay-content {
+      background: rgba(255, 255, 255, 0.95);;
+      padding: 2em;
+      transition: opacity 1s;
+
+      h1 {
+        padding-bottom: 0.3em;
+      }
+
+      nav {
+        ul {
+          list-style: disc;
+          list-style-position: inside;
+          li {
+            padding-bottom: 0.25em;
           }
-				}
+        }
       }
     }
   }
