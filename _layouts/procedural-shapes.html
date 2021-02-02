@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include head.html %}
+
+  <body>
+    <div class="container procedural-shapes">
+      {% include header.html title=page.title %}
+
+      <p>
+      <a href="/">
+        This site's home page animation
+      </a> is proceduraly generated using javascript, SVG, and CSS keyframe animations.
+      </p>
+
+      <p>
+      On each page load the algorithm generates a unique animation and
+      layout of shapes. It randomly subdivides the browser viewport area and, for each
+      sub-area, either paints a shape, or recurses upon it - repeating the process.
+      </p>
+
+      <p>
+      The colors and shapes are directly inspired by Inyegumena Nosegbe's design
+      explorations for <a href="https://www.instagram.com/publicservice.xyz/">PUBLIC SERVICE</a>.
+      </p>
+
+      <div class="vid-padding">
+        <video width="100%" controls loop>
+          <source src="{{ site.url }}/assets/procedural-animation.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+    <div>
+  </body>
+
+</html>
+
