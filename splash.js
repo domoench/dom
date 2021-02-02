@@ -189,6 +189,7 @@ const draw = ({ viewW, viewH, cellW }) => {
     t.setAttribute('lengthAdjust', 'spacingAndGlyphs');
     t.setAttribute('text-anchor', 'middle');
     t.setAttribute('dominant-baseline', 'central');
+    // TODO this is not working in all browsers to set Ubuntu. Just falls back on sans-serif.
     t.setAttribute('style', `font-size:${0.12 * w}px; font-family:Ubuntu,sans-serif;`);
     t.className.baseVal = 'text';
     const textNode = document.createTextNode('david ouyang moench');
