@@ -30,7 +30,7 @@ const moveStyles = () => {
   let result = '';
   for (let i = 0; i < numMovements; i += 1) {
     const dir = truePercent(0.5) ? 'X' : 'Y';
-    const dist = (Math.floor(Math.random() * 80)) - 40;
+    const dist = Math.floor(Math.random() * 80) - 40;
     const slideTime = Math.floor(Math.random() * 3);
     const fadeTime = Math.max(1, Math.floor(Math.random() * 3));
     result += `
@@ -62,19 +62,25 @@ const moveStyles = () => {
 
 const calculateDimensions = () => {
   // Calculate grid dimensions from screen size
-  const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-  const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    // Pick target cell width based on screen dimensions
+  const width = Math.max(
+    document.documentElement.clientWidth,
+    window.innerWidth || 0,
+  );
+  const height = Math.max(
+    document.documentElement.clientHeight,
+    window.innerHeight || 0,
+  );
+  // Pick target cell width based on screen dimensions
   // XS: [0px,575px] => 75px
   // SM: [576px,767px] => 85
   // MD: [768px,991px] => 100px
   // LG: [992px,1199] => 120px
   // XL: [1200px,∞px] => 120px
   const breakpoints = [
-    { screen: 576, target: 75 },
-    { screen: 768, target: 85 },
-    { screen: 992, target: 100 },
-    { screen: 1200, target: 120 },
+    {screen: 576, target: 75},
+    {screen: 768, target: 85},
+    {screen: 992, target: 100},
+    {screen: 1200, target: 120},
   ];
 
   let cellW = 140;
@@ -101,18 +107,18 @@ const calculateDimensions = () => {
     padH,
     cellW,
   };
-}
+};
 
-const draw = ({ viewW, viewH, cellW }) => {
-  console.log('draw()');
+const draw = ({viewW, viewH, cellW}) => {
   const svg = document.getElementById('splash-svg');
 
   const isSingleCell = (w, h) => w === 1 && h === 1;
   const isSquare = (x, y) => x === y;
 
   // Return a random movement class
-  const randomMoveClass = () => `mover${Math.floor(Math.random() * numMovements)}`;
-  const randomColor = (noWhite) => {
+  const randomMoveClass = () =>
+    `mover${Math.floor(Math.random() * numMovements)}`;
+  const randomColor = noWhite => {
     let colors = ['#2F4FA2', '#F6F3F4', '#FE0000', '#229446', '#FDD316'];
     colors = noWhite ? colors : [...colors, '#FFF'];
     const i = Math.floor(Math.random() * colors.length);
@@ -166,7 +172,9 @@ const draw = ({ viewW, viewH, cellW }) => {
     if (truePercent(0.7)) {
       // Circle border most likely to be thin
       let strokeWidth = Math.floor(Math.random() * r * 0.1);
-      strokeWidth = truePercent(0.1) ? Math.floor(Math.random() * r * 0.75) : strokeWidth;
+      strokeWidth = truePercent(0.1)
+        ? Math.floor(Math.random() * r * 0.75)
+        : strokeWidth;
       c.setAttribute('stroke', randomColor());
       c.setAttribute('stroke-width', strokeWidth);
       r -= strokeWidth / 2;
@@ -190,7 +198,10 @@ const draw = ({ viewW, viewH, cellW }) => {
     t.setAttribute('text-anchor', 'middle');
     t.setAttribute('dominant-baseline', 'central');
     // TODO this is not working in all browsers to set Ubuntu. Just falls back on sans-serif.
-    t.setAttribute('style', `font-size:${0.12 * w}px; font-family:Ubuntu,sans-serif;`);
+    t.setAttribute(
+      'style',
+      `font-size:${0.12 * w}px; font-family:Ubuntu,sans-serif;`,
+    );
     t.className.baseVal = 'text';
     const textNode = document.createTextNode('david ouyang moench');
     t.appendChild(textNode);
@@ -206,11 +217,12 @@ const draw = ({ viewW, viewH, cellW }) => {
 
     // Make it rare for a circle to exist on its own (should mostly be inside squares)
     const circlePercent = squareResults ? 0.5 : 0.03;
-    const notWhiteSquare = !squareResults || (squareResults && squareResults.fillColor !== '#FFF');
+    const notWhiteSquare =
+      !squareResults || (squareResults && squareResults.fillColor !== '#FFF');
     if (truePercent(circlePercent) && notWhiteSquare) {
       let [cx, cy, cw] = [x, y, w];
       if (squareResults) {
-        const { innerX, innerY, innerW } = squareResults;
+        const {innerX, innerY, innerW} = squareResults;
         [cx, cy, cw] = [innerX, innerY, innerW];
       }
       fillCircle(cx, cy, cw);
@@ -228,7 +240,9 @@ const draw = ({ viewW, viewH, cellW }) => {
       for (let i = 0; i < depth; i += 1) {
         indent += '  ';
       }
-      console.debug(`${indent}[D${depth}] partition(x:${x}, y:${y}, w:${w}, h:${h})`);
+      console.debug(
+        `${indent}[D${depth}] partition(x:${x}, y:${y}, w:${w}, h:${h})`,
+      );
     }
 
     // Convert grid cell dimensions to pixel dimensions
@@ -284,11 +298,11 @@ const draw = ({ viewW, viewH, cellW }) => {
   };
 
   partition(0, 0, viewW / cellW, viewH / cellW, 0);
-}
+};
 
-const setCSS = ({ viewH, padH, padW }) => {
+const setCSS = ({viewH, padH, padW}) => {
   // Clear pre-existing styles
-  const prevStyles = document.getElementById('dynamic-styles')
+  const prevStyles = document.getElementById('dynamic-styles');
   if (prevStyles) {
     prevStyles.remove(prevStyles);
   }
@@ -313,32 +327,33 @@ const setCSS = ({ viewH, padH, padW }) => {
 // here rather than dealing with including all of underscore or messing with
 // webpack and modules.
 function debounce(func, wait, immediate) {
-	var timeout;
-	return function() {
-		var context = this, args = arguments;
-		var later = function() {
-			timeout = null;
-			if (!immediate) func.apply(context, args);
-		};
-		var callNow = immediate && !timeout;
-		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
-		if (callNow) func.apply(context, args);
-	};
-};
+  var timeout;
+  return function() {
+    var context = this,
+      args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
 
 const toggleNavModal = () => {
   // Toggle modal visibility
   overlayVisible = !overlayVisible;
   modalOpacity = overlayVisible ? 1.0 : 0.0;
-  document.querySelector(".overlay-content").style.opacity = modalOpacity;
+  document.querySelector('.overlay-content').style.opacity = modalOpacity;
 
   // Toggle visibility of SVG animated name
-  svgText = document.querySelector('#splash-svg text')
+  svgText = document.querySelector('#splash-svg text');
   if (svgText) {
     svgText.style.opacity = 1.0 - modalOpacity;
   }
-}
+};
 
 // MAIN
 window.onload = () => {
@@ -352,14 +367,14 @@ window.onload = () => {
       toggleNavModal();
     }
   }, 3 * 1000);
-}
+};
 
 window.onresize = debounce(() => {
   const dimensions = calculateDimensions();
   setCSS(dimensions);
 
   // Clear the existing SVGs
-  const svg = document.querySelector("#splash-svg");
+  const svg = document.querySelector('#splash-svg');
   while (svg.lastElementChild) {
     svg.removeChild(svg.lastElementChild);
   }
@@ -371,7 +386,7 @@ window.onresize = debounce(() => {
 }, 200);
 
 // Toggle nav menu modal visibility
-window.onclick = (e) => {
+window.onclick = e => {
   // Determine if click is inside nav modal. If so we'll assume user is trying
   // to interact with modal, so we won't want to toggle its visibility.
   const clickedInsideModal = e.target.closest('.overlay-content');
@@ -379,4 +394,4 @@ window.onclick = (e) => {
   if (!overlayVisible || !clickedInsideModal) {
     toggleNavModal();
   }
-}
+};
