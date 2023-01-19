@@ -366,7 +366,7 @@ window.onload = () => {
     if (!overlayVisible) {
       toggleNavModal();
     }
-  }, 3 * 1000);
+  }, 1.8 * 1000);
 };
 
 window.onresize = debounce(() => {
