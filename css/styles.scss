@@ -54,7 +54,18 @@ a {
 			padding-right: 10px;
 		}
 	}
+
+  .figure {
+    max-width: 960px;
+  }
+
+  .figure-caption {
+    text-align: center;
+    padding-top: 10px;
+    font-size: 80%;
+  }
 }
+
 
 #splash {
   #splash-svg {
@@ -95,7 +106,7 @@ a {
 }
 
 .detail-header {
-  padding-bottom: 1em;
+  padding-bottom: 2em;
   padding-right: 20px;
 	h1 {
 		display: none;
