@@ -9,4 +9,5 @@ bundle exec jekyll serve
 ```
 
 # Building for deployment
-TODO
+
+Automatically deploys via Netlify when pushing to master. Runs `jekyll build`.

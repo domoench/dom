@@ -38,5 +38,13 @@ reduction goals. One potential use of this EJ index is producing a literal map o
 which bus routes should be electrified to achieve the greatest reduction in
 environmental burden for the same investment.
 
+RESET lab's goal is to use [NREL's FASTSim vehicle powertrain simulator][fastsim] to determine the technical feasibility of electrifying the most EJ-burdened bus routes to lend credibility to recommendations to electrify those routes. I worked on this effort. Specifically on validating our electric bus parameters by using FASTSim to replicate the results of a 2021 UC Berkeley study in Mexicali that experimentally recorded bus route drive cycles and modeled the power requirements of electric buses for those routes.
+
+I found that FASTSim's simulation consistently estimated the driving range of an electric bus on a given route at 75% of that estimated by the proprietary black-box simulation software used in the study. What accounts for this difference? We don't know yet. The next step we plan to try is de-noising the drive cycle data around stops because it may account for false movement (and therefore energy expenditure) in our FASTSim simulation.
+
+The jupyter lab code I wrote for this project can be found [HERE][reset-code].
+
 [castellanos]: https://www.sergiocastellanos.com/
 [reset]: https://www.reset-lab.com/
+[fastsim]: https://www.nrel.gov/transportation/fastsim.html
+[reset-code]: https://github.com/RESET-Lab/TransitBusSimulation/blob/19846dd023e44790baad84385c1fa25af99f7ef2/FASTSim%20Simulation/Bus%20Parameter%20Validation.ipynb
