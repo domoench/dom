@@ -22,6 +22,8 @@ $screen-sm-min: 768px;
 body {
   font-family: $body-font-family;
   font-size: $body-font-size;
+  padding: 0.5em 0;
+  line-height: 1.5em;
 }
 
 h1 {
@@ -71,7 +73,7 @@ a {
   h1,
   h2,
   h3 {
-    padding-top: 0.5em;
+    padding-top: 0.75em;
     padding-bottom: 0.25em;
   }
 
@@ -83,6 +85,9 @@ a {
     text-align: center;
     padding-top: 10px;
     font-size: 80%;
+  }
+  ol {
+    list-style: decimal inside none;
   }
 }
 
