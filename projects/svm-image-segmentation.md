@@ -10,7 +10,7 @@ Chesapeake Bay watershed][dataset] in two ways:
 1. Using a convolutional neural network. i.e. A deep learning approach.
 1. Using SVMs. i.e. A traditional machine learning approach.
 
-## CNN Approach (W.I.P.)
+## CNN Approach
 
 Detailed in [this Kaggle notebook](https://www.kaggle.com/code/davidom/wip-landcover-segmentation).
 
